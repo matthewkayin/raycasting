@@ -39,7 +39,7 @@ public class Main extends JPanel{
 
     private Level level;
     private Robot robot;
-    private BufferedImage texture;
+    private Texture texture;
     private BufferedImage offscreen;
     private int[] buffer;
 
@@ -148,17 +148,18 @@ public class Main extends JPanel{
         });
 
         level = new Level();
+
         try{
 
             robot = new Robot();
-            File file = new File("/home/matt/Documents/raycasting/raycasting-game/res/texture.png");
-            texture = ImageIO.read(file);
 
         }catch(Exception e){
 
             e.printStackTrace();
             System.exit(0);
         }
+
+        texture = new Texture("/home/matt/Documents/raycasting/raycasting-game/res/texture.png");
 
         offscreen = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         buffer = ((DataBufferInt)offscreen.getRaster().getDataBuffer()).getData();
@@ -306,8 +307,20 @@ public class Main extends JPanel{
                     //g2d.drawImage(before, x, y, null);
                     //g2d.drawImage(theTexture.getScaledSlice((int)distance[1], height), x, y, null);
                     //offScreenGraphics.fillRect(x, y, width, height);
-                    fillRect(x, y, width, height, new int[]{255, 255, 0, 0});
+                    //fillRect(x, y, width, height, new int[]{255, 255, 0, 0});
+                    drawPixels(x, y, width, height, texture.getSlice( (int)distance[1], height ) );
                 }
+            }
+        }
+    }
+
+    private void drawPixels(int x, int y, int w, int h, int[] pixels){
+
+        for(int i = 0; i < w; i++){
+
+            for(int j = 0; j < h; j++){
+
+                putpixel(x + i, y + j, pixels[i + (j * w)]);
             }
         }
     }
@@ -344,6 +357,17 @@ public class Main extends JPanel{
 
         int index = (x + (y * offscreen.getWidth()));
         buffer[index] = ((argb[0] << 24) + (argb[1] << 16) + (argb[2] << 8) + argb[3]);
+    }
+
+    private void putpixel(int x, int y, int pixel){
+
+        if(x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT){
+
+            return;
+        }
+
+        int index = (x + (y * offscreen.getWidth()));
+        buffer[index] = pixel;
     }
 
     public static void main(String[] args){
