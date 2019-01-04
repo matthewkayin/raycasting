@@ -1,10 +1,16 @@
 package com.matthewkayin.ray;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.io.IOException;
 import java.lang.Math;
 
 public class Main extends JPanel{
@@ -36,6 +42,11 @@ public class Main extends JPanel{
 
     private Level level;
     private Robot robot;
+    private BufferedImage texture;
+    private BufferedImage offScreenImage;
+    private int[] buffer;
+    private int[] color = new int[]{0, 0, 0, 0};
+    //private Graphics2D offScreenGraphics;
 
     public Main(){
 
@@ -152,6 +163,22 @@ public class Main extends JPanel{
 
             e.printStackTrace();
         }
+        try{
+
+            File file = new File("/home/matt/Documents/raycasting/raycasting-game/res/texture.png");
+            texture = ImageIO.read(file);
+
+        }catch(IOException e){
+
+            e.printStackTrace();
+            System.exit(0);
+        }
+
+        offScreenImage = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        //offScreenGraphics = (Graphics2D)offScreenImage.getGraphics();
+        final int[] a = ((DataBufferInt)offScreenImage.getRaster().getDataBuffer()).getData();
+        buffer = new int[a.length];
+        System.arraycopy(a, 0, buffer, 0, a.length);
 
         running = false;
     }
@@ -264,30 +291,109 @@ public class Main extends JPanel{
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
 
-        g2d.setColor(Color.red);
-        renderLevel(g2d);
+        //offScreenGraphics.setColor(Color.black);
+        //offScreenGraphics.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        //offScreenGraphics.setColor(Color.red);
+        renderLevel();
+
+        final int[] a = ((DataBufferInt)offScreenImage.getRaster().getDataBuffer()).getData();
+        System.arraycopy(buffer, 0, a, 0, buffer.length);
+        g2d.drawImage(offScreenImage, 0, 0, null);
 
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
 
-    private void renderLevel(Graphics2D g2d){
+    private void renderLevel(){
 
         int width = SCREEN_WIDTH / 320;
         double anglestep = 60 / (SCREEN_WIDTH * (1 / (double)width));
         for(int i = 0; i < SCREEN_WIDTH; i++){
 
             double angle = -30 + (anglestep * i);
-            double distance = level.raycast(angle);
-            if(distance != -1){
+            double distance[] = level.raycast(angle);
+            if(distance[0] != -1){
 
-                distance = distance * Math.cos(Math.toRadians(angle));
-                int height = (int)(SCREEN_HEIGHT / distance);
-                int y = (SCREEN_HEIGHT - height) / 2;
-                int x = (SCREEN_WIDTH - ((i * width) + 1));
-                g2d.fillRect(x, y, width, height);
+                distance[0] = distance[0] * Math.cos(Math.toRadians(angle));
+                int height = (int)(SCREEN_HEIGHT / distance[0]);
+                if(height > SCREEN_HEIGHT){
+
+                    height = SCREEN_HEIGHT;
+                }
+                if(height > 0){
+
+                    int y = (SCREEN_HEIGHT - height) / 2;
+                    int x = (SCREEN_WIDTH - ((i * width) + 1));
+                    //Image before = texture.getSubimage((int)distance[1], 0, width, 64).getScaledInstance(width, height, Image.SCALE_FAST);
+                    //g2d.drawImage(before, x, y, null);
+                    //g2d.drawImage(theTexture.getScaledSlice((int)distance[1], height), x, y, null);
+                    //offScreenGraphics.fillRect(x, y, width, height);
+                    fillRect(x, y, width, height);
+                }
             }
         }
+    }
+
+    private void fillRect(int x, int y, int width, int height){
+
+        if(x < 0){
+
+            width += x;
+            x = 0;
+
+        }else if(x >= SCREEN_WIDTH){
+
+            width -= (SCREEN_WIDTH - x - 1);
+            x = SCREEN_WIDTH - 1;
+        }
+
+        if(y < 0){
+
+            height += y;
+            y = 0;
+
+        }else if(y >= SCREEN_HEIGHT){
+
+            height -= SCREEN_HEIGHT - y - 1;
+            y = SCREEN_HEIGHT - 1;
+        }
+
+        if(width <= 0 || height <= 0){
+
+            return;
+        }
+
+        for(int i = x; i < x + width; i++){
+
+            for(int j = y; j < y + height; j++){
+
+                int index = i + (j * SCREEN_WIDTH);
+                if(index == -1){
+
+                    System.out.println(x + ", " + y);
+                }
+                putPixel(index);
+            }
+        }
+    }
+
+    private void putPixel(int index){
+
+        try{
+            buffer[index] = (color[0] << 24) | (color[1] << 16) | (color[2] << 8) | color[3];
+
+        }catch(ArrayIndexOutOfBoundsException e){
+
+            System.out.println(index);
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+    private int[] getPixel(int index){
+
+        int p = buffer[index];
+        return new int[]{(p >> 24) & 0xFF, (p >> 16) & 0xFF, (p >> 8) & 0xFF, p & 0xFF};
     }
 
     public static void main(String[] args){

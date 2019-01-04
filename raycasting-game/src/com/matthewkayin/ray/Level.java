@@ -43,7 +43,7 @@ public class Level{
         direction = rotate(direction, delta * input * ROT_SPEED * -1);
     }
 
-    public double raycast(double angle){
+    public double[] raycast(double angle){
 
         double dir[] = rotate(direction, angle);
         double xdist = dir[0];
@@ -51,6 +51,7 @@ public class Level{
         double distance = 0;
         int xdir = 0;
         int ydir = 0;
+        int offset = 0;
 
         if(xdist > 0){
 
@@ -174,10 +175,19 @@ public class Level{
 
         if(!hit || getMagnitude(new double[]{point[0] - position[0], point[1] - position[1]}) > RANGE){
 
-            return -1;
+            return new double[]{-1, 0.0};
         }
 
-        return distance;
+        if((int)(point[0]) == point[0]){
+
+            offset = (int)(point[1] * 64) % 64;
+
+        }else{
+
+            offset = (int)(point[0] * 64) % 64;
+        }
+
+        return new double[]{distance, offset};
     }
 
     private double[] getRaycastPoint(double dir[]){
