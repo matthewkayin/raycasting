@@ -10,6 +10,8 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.io.File;
 
+//THING TO BE AWARE OF - FOR SOME REASON WE REFER TO THE MAP WITH THE OPPOSITE X/Y COORDS AND IT WORKS ON THE RENDER SIDE CORRECTLY
+
 public class Main extends JPanel{
 
     private boolean running;

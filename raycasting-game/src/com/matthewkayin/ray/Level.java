@@ -24,12 +24,12 @@ public class Level{
 
     public int getWidth(){
 
-        return 6;
+        return map[0].length;
     }
 
     public int getHeight(){
 
-        return 7;
+        return map.length;
     }
 
     public double getPlayerX(){
@@ -54,7 +54,7 @@ public class Level{
 
     public int getMap(int x, int y){
 
-        return map[x][y];
+        return map[y][x];
     }
 
     void movePlayer(double delta, double angle){
@@ -66,7 +66,7 @@ public class Level{
         position[1] += step[1];
 
         //Don't perform movement if movement will result in collision with wall
-        if(map[(int)position[0]][(int)position[1]] != 0){
+        if(map[(int)position[1]][(int)position[0]] != 0){
 
             position[0] -= step[0];
             position[1] -= step[1];
@@ -435,7 +435,7 @@ public class Level{
 
     private boolean checkPoint(int x, int y){
 
-        return (x >= 0 && x <= map.length - 1 && y >= 0 && y <= map[0].length - 1 && map[x][y] != 0);
+        return (x >= 0 && x <= map[0].length - 1 && y >= 0 && y <= map.length - 1 && map[y][x] != 0);
     }
 
     private double getMagnitude(double point[]){
@@ -445,17 +445,7 @@ public class Level{
 
     private double[] rotate(double other[], double angle){
 
-        double rm[][] = getRotationMatrix(angle);
-        return new double[]{rm[0][0] * other[0] + rm[1][0] * other[1], rm[0][1] * other[0] + rm[1][1] * other[1]};
-    }
-
-    private double[][] getRotationMatrix(double angle){
-
         double rads = Math.toRadians(angle);
-        double a = Math.cos(rads);
-        double b = Math.sin(rads);
-        double c = -1 * b;
-
-        return new double[][]{{a, c}, {b, a}};
+        return new double[]{(other[0] * Math.cos(rads)) - (other[1] * Math.sin(rads)), (other[0] * Math.sin(rads)) + (other[1] * Math.cos(rads))};
     }
 }
