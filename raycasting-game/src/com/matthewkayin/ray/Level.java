@@ -6,12 +6,12 @@ public class Level{
 
     private double position[];
     private double direction[];
-    private int map[][] =  {{1, 1, 1, 1, 1, 1},
-                            {1, 0, 0, 0, 0, 1},
-                            {1, 0, 0, 0, 0, 1},
-                            {1, 0, 1, 1, 0, 1},
-                            {1, 0, 1, 1, 0, 1},
-                            {1, 1, 1, 1, 1, 1}};
+    private int map[][] =  {{1, 1, 1, 1, 1, 1, 1},
+                            {1, 0, 0, 0, 0, 1, 1},
+                            {1, 0, 0, 0, 0, 1, 1},
+                            {1, 0, 1, 1, 0, 0, 1},
+                            {1, 0, 1, 1, 0, 0, 1},
+                            {1, 1, 1, 1, 1, 1, 1}};
     private final int RANGE = 5;
     private final double SPEED = 0.01;
     private final double ROT_SPEED = 2;
@@ -20,6 +20,41 @@ public class Level{
 
         position = new double[]{1.5, 1.5};
         direction = new double[]{RANGE, 0};
+    }
+
+    public int getWidth(){
+
+        return 6;
+    }
+
+    public int getHeight(){
+
+        return 7;
+    }
+
+    public double getPlayerX(){
+
+        return position[0];
+    }
+
+    public double getPlayerY(){
+
+        return position[1];
+    }
+
+    public double getDirX(){
+
+        return direction[0];
+    }
+
+    public double getDirY(){
+
+        return direction[1];
+    }
+
+    public int getMap(int x, int y){
+
+        return map[x][y];
     }
 
     void movePlayer(double delta, double angle){
@@ -400,7 +435,7 @@ public class Level{
 
     private boolean checkPoint(int x, int y){
 
-        return (x >= 0 && x <= map[0].length - 1 && y >= 0 && y <= map.length - 1 && map[y][x] != 0);
+        return (x >= 0 && x <= map.length - 1 && y >= 0 && y <= map[0].length - 1 && map[x][y] != 0);
     }
 
     private double getMagnitude(double point[]){

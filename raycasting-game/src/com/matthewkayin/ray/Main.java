@@ -36,6 +36,7 @@ public class Main extends JPanel{
     private int oldmousex = 0;
     private int oldmousey = 0;
     private boolean lockMouse = false;
+    private boolean showMap = false;
 
     private Level level;
     private Robot robot;
@@ -94,6 +95,10 @@ public class Main extends JPanel{
                 }else if(keycode == KeyEvent.VK_F2){
 
                     lockMouse = !lockMouse;
+
+                }else if(keycode == KeyEvent.VK_F1){
+
+                    showMap = !showMap;
                 }
 
                 switch(keycode){
@@ -276,7 +281,15 @@ public class Main extends JPanel{
         Graphics2D g2d = (Graphics2D)g;
 
         fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, new int[]{255, 0, 0, 0});
-        renderLevel();
+
+        if(showMap){
+
+            renderMap();
+
+        }else{
+
+            renderLevel();
+        }
 
         g2d.drawImage(offscreen, 0, 0, null);
         Toolkit.getDefaultToolkit().sync();
@@ -314,6 +327,28 @@ public class Main extends JPanel{
         }
     }
 
+    private void renderMap(){
+
+        for(int i = 0; i < level.getWidth(); i++){
+
+            for(int j = 0; j < level.getHeight(); j++){
+
+
+                if(level.getMap(i, j) != 0){
+
+                    fillRect(i * 32, j * 32, 32, 32, new int[]{255, 255, 0, 0});
+
+                }else{
+
+                    drawRect(i * 32, j * 32, 32, 32, new int[]{255, 255, 0, 0});
+                }
+            }
+        }
+
+        fillRect((int)(level.getPlayerX() * 32) - 2, (int)(level.getPlayerY() * 32) - 2, 4, 4, new int[]{255, 0, 255, 0});
+        fillRect((int)(level.getDirX() * 32) - 2, (int)(level.getDirY() * 32) - 2, 4, 4, new int[]{255, 0, 0, 255});
+    }
+
     private void drawPixels(int x, int y, int w, int h, int[] pixels){
 
         for(int i = 0; i < w; i++){
@@ -333,6 +368,21 @@ public class Main extends JPanel{
 
                 putpixel(x + i, y + j, color);
             }
+        }
+    }
+
+    private void drawRect(int x, int y, int w, int h, int[] color){
+
+        for(int i = 0; i < w; i++){
+
+            putpixel(x + i, y, color);
+            putpixel(x + i, y + h - 1, color);
+        }
+
+        for(int i = 1; i < h - 1; i++){
+
+            putpixel(x, y + i, color);
+            putpixel(x + w - 1, y + i, color);
         }
     }
 
