@@ -107,10 +107,13 @@ public class Level{
 
         double point[] = {position[0], position[1]};
         boolean hit = false;
+        boolean positive = false; //the positive flag ensures that rays drawn from any direction return an offset that ensures textures are drawn left to right from any direction
 
-        while(!hit && getMagnitude(new double[]{point[0] - position[0], point[1] - position[1]}) <= RANGE){
+        while(!hit && getMagnitude(new double[]{point[0] - position[0], point[1] - position[1]}) <= RANGE && inBounds(point[0], point[1])){
 
             if(xdir == 0){
+
+                positive = (ydir > 0);
 
                 if((int)(point[1]) != point[1]){
 
@@ -131,6 +134,8 @@ public class Level{
                 distance = getMagnitude(new double[]{point[0] - position[0], point[1] - position[1]});
 
             }else if(ydir == 0){
+
+                positive = (xdir < 0);
 
                 if((int)(point[0]) != point[0]){
 
@@ -197,11 +202,13 @@ public class Level{
                     distance = dist;
                     point[0] = x;
                     point[1] = y;
+                    positive = (xdir < 0);
 
                 }else{
 
                     point[0] = x2;
                     point[1] = y2;
+                    positive = (ydir > 0);
                 }
             }
 
@@ -220,6 +227,11 @@ public class Level{
         }else{
 
             offset = (int)(point[0] * 64) % 64;
+        }
+
+        if(!positive){
+
+            offset = 64 - offset;
         }
 
         return new double[]{distance, offset};
@@ -435,7 +447,12 @@ public class Level{
 
     private boolean checkPoint(int x, int y){
 
-        return (x >= 0 && x <= map[0].length - 1 && y >= 0 && y <= map.length - 1 && map[y][x] != 0);
+        return (inBounds(x, y) && map[y][x] != 0);
+    }
+
+    private boolean inBounds(double x, double y){
+
+        return x >= 0 && x <= map[0].length - 1 && y >= 0 && y <= map.length - 1;
     }
 
     private double getMagnitude(double point[]){

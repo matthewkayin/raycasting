@@ -53,21 +53,30 @@ public class Texture{
         return argb;
     }
 
-    public int[] getSlice(int offset, int ht){
+    public int[] getSlice(int xoffset, int yoffset, int wdt, int ht){
 
-        int rowsToUse[] = new int[4];
-        for(int i = 0; i < 4; i++){
+        int rowsToUse[] = new int[wdt];
+        for(int i = 0; i < wdt; i++){
 
-            rowsToUse[i] = (offset + i) % 64; //wrap around if we're at the edge
+            rowsToUse[i] = (xoffset + i);
         }
-        int slice[] = new int[4 * ht];
-        for(int x = 0; x < 4; x++){
+        int slice[] = new int[wdt * ht];
+        double halfyoff = yoffset / 2.0;
+
+        //for(int x = 0; x < 4; x++){
+        for(int x = 0; x < wdt; x++){
 
             for(int y = 0; y < ht; y++){
 
-                int srcY = (int)Math.round( (double)y / (double)ht * (double)height );
-                srcY = Math.min(srcY, height - 1);
-                slice[x + (y * 4)] = pixels[rowsToUse[x] + (srcY * width)];
+                int texX = (int)Math.round((x / (double)wdt) * (width - 1));
+                texX = (texX + rowsToUse[x]) % width;
+                int texY = (int)Math.round(( (y + halfyoff) / (double)(ht + yoffset) ) * (height - 1));
+
+                if(texX + (texY * width) < 0){
+
+                    System.out.println(texX + ", " + texY);
+                }
+                slice[x + (y * wdt)] = pixels[texX + (texY * width)];
             }
         }
 

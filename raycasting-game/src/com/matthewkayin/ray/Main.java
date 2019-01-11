@@ -300,30 +300,30 @@ public class Main extends JPanel{
 
     private void renderLevel(){
 
-        int width = SCREEN_WIDTH / 320;
+        //int width = SCREEN_WIDTH / 320;
+        int width = 1;
         double anglestep = 60 / (SCREEN_WIDTH * (1 / (double)width));
-        for(int i = 0; i < SCREEN_WIDTH; i++){
+        double wallHeightFactor = 1;
+        for(int i = 0; i < SCREEN_WIDTH / width; i++){
 
             double angle = -30 + (anglestep * i);
             double distance[] = level.raycast(angle);
             if(distance[0] != -1){
 
                 distance[0] = distance[0] * Math.cos(Math.toRadians(angle));
-                int height = (int)(SCREEN_HEIGHT / distance[0]);
+                //int height = (int)(SCREEN_HEIGHT / distance[0]);
+                int height = (int)((wallHeightFactor / distance[0]) * SCREEN_HEIGHT);
+                int yoffset = 0;
                 if(height > SCREEN_HEIGHT){
 
+                    yoffset = height - SCREEN_HEIGHT;
                     height = SCREEN_HEIGHT;
                 }
                 if(height > 0){
 
                     int y = (SCREEN_HEIGHT - height) / 2;
                     int x = (SCREEN_WIDTH - ((i * width) + 1));
-                    //Image before = texture.getSubimage((int)distance[1], 0, width, 64).getScaledInstance(width, height, Image.SCALE_FAST);
-                    //g2d.drawImage(before, x, y, null);
-                    //g2d.drawImage(theTexture.getScaledSlice((int)distance[1], height), x, y, null);
-                    //offScreenGraphics.fillRect(x, y, width, height);
-                    //fillRect(x, y, width, height, new int[]{255, 255, 0, 0});
-                    drawPixels(x, y, width, height, texture.getSlice( (int)distance[1], height ) );
+                    drawPixels(x, y, width, height, texture.getSlice( (int)distance[1], yoffset, width, height ) );
                 }
             }
         }
@@ -420,6 +420,18 @@ public class Main extends JPanel{
 
         int index = (x + (y * offscreen.getWidth()));
         buffer[index] = pixel;
+    }
+
+    private int[] getARGB(int x, int y){
+
+        int pixel = buffer[x + (y * offscreen.getWidth())];
+        int color[] = new int[]{0, 0, 0, 0};
+        color[0] = (pixel >> 24) & 0xFF;
+        color[1] = (pixel >> 16) & 0xFF;
+        color[2] = (pixel >> 8) & 0xFF;
+        color[3] = pixel & 0xFF;
+
+        return color;
     }
 
     public static void main(String[] args){
