@@ -324,6 +324,16 @@ public class Main extends JPanel{
                     int y = (SCREEN_HEIGHT - height) / 2;
                     int x = (SCREEN_WIDTH - ((i * width) + 1));
                     drawPixels(x, y, width, height, texture.getSlice( (int)distance[1], yoffset, width, height ) );
+
+//                    double floorstep = distance[0] / (double)y;
+//                    for(int j = 0; j < y; j++){
+//`
+//                        double currentDist = distance[0] - (floorstep * j);
+//                        int floor[] = level.getFloorPixel(angle, currentDist);
+//                        int ciel[] = level.getCeilPixel(angle, currentDist);
+//                        putpixel(x, j, texture.getFloorPixel(floor[1], floor[2]));
+//                        putpixel(x, y + height + j, texture.getFloorPixel(ciel[1], ciel[2]));
+//                    }
                 }
             }
         }

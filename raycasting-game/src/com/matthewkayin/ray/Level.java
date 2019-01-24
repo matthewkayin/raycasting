@@ -12,6 +12,18 @@ public class Level{
                             {1, 0, 1, 1, 0, 0, 1},
                             {1, 0, 1, 1, 0, 0, 1},
                             {1, 1, 1, 1, 1, 1, 1}};
+    private int floormap[][] =  {{1, 1, 1, 1, 1, 1, 1},
+                                {1, 1, 1, 1, 1, 1, 1},
+                                {1, 1, 1, 1, 1, 1, 1},
+                                {1, 1, 1, 1, 1, 1, 1},
+                                {1, 1, 1, 1, 1, 1, 1},
+                                {1, 1, 1, 1, 1, 1, 1}};
+    private int ceilingmap[][] =  {{1, 1, 1, 1, 1, 1, 1},
+                                    {1, 1, 1, 1, 1, 1, 1},
+                                    {1, 1, 1, 1, 1, 1, 1},
+                                    {1, 1, 1, 1, 1, 1, 1},
+                                    {1, 1, 1, 1, 1, 1, 1},
+                                    {1, 1, 1, 1, 1, 1, 1}};
     private final int RANGE = 5;
     private final double SPEED = 0.01;
     private final double ROT_SPEED = 2;
@@ -76,6 +88,28 @@ public class Level{
     void rotatePlayer(double delta, double input){
 
         direction = rotate(direction, delta * input * ROT_SPEED * -1);
+    }
+
+    public int[] getFloorPixel(double angle, double distance){
+
+        double dir[] = rotate(direction, angle);
+        int tx = (int)((position[0] + dir[0]) * 64) % 64;
+        int ty = (int)((position[1] + dir[1]) * 64) % 64;
+        int x = (int)(position[0] + dir[0]);
+        int y = (int)(position[1] + dir[1]);
+
+        return new int[]{floormap[x][y], tx, ty};
+    }
+
+    public int[] getCeilPixel(double angle, double distance){
+
+        double dir[] = rotate(direction, angle);
+        int tx = (int)((position[0] + dir[0]) * 64) % 64;
+        int ty = (int)((position[1] + dir[1]) * 64) % 64;
+        int x = (int)(position[0] + dir[0]);
+        int y = (int)(position[1] + dir[1]);
+
+        return new int[]{ceilingmap[x][y], tx, ty};
     }
 
     public double[] raycast(double angle){
