@@ -166,7 +166,7 @@ public class Main extends JPanel{
             System.exit(0);
         }
 
-        texture = new Texture("/home/matt/Documents/raycasting/raycasting-game/res/texture.png");
+        texture = new Texture("res/texture.png");
 
         offscreen = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         buffer = ((DataBufferInt)offscreen.getRaster().getDataBuffer()).getData();
